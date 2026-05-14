@@ -1,24 +1,10 @@
-#!/usr/bin/env bash
+#!/bin/zsh
 
-#----------------------------------------
-# Ghidra launch
-#----------------------------------------
-
-# Maximum heap memory may be changed if default is inadequate. This will generally be up to 1/4 of 
-# the physical memory available to the OS. Uncomment MAXMEM setting if non-default value is needed.
-#MAXMEM=2G
-
-export GHIDRA_INSTALL_DIR=$(dirname $(readlink /opt/homebrew/bin/ghidraRun))
-
-# Unquarantine Ghidra if it is (updates will cause this)
-# This is done to avoid the user being prompted to allow the decompiler to run
-if [ '$(xattr $GHIDRA_INSTALL_DIR | grep com.apple.quarantine)' = 'com.apple.quarantine' ]
-then
-    echo 'Ghidra is quarantined, invoking xattr...'
-    xattr -r -d com.apple.quarantine $GHIDRA_INSTALL_DIR
+if [ -f /opt/homebrew/bin/ghidraRun ] && [ -x /opt/homebrew/bin/ghidraRun ]; then
+  /opt/homebrew/bin/ghidraRun
+elif [ -f /usr/local/bin/ghidraRun ] && [ -x /usr/local/bin/ghidraRun ]; then
+	/usr/local/bin/ghidraRun
 else
-    echo 'Ghidra is not quarantined'
+	osascript -e 'tell app "System Events" to display alert "Unable to find Homebrew-managed Ghidra installation."'
 fi
 
-# Launch Ghidra
-"${GHIDRA_INSTALL_DIR}"/support/launch.sh bg jdk Ghidra "${MAXMEM}" "" ghidra.GhidraRun "$@"
